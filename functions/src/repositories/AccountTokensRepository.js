@@ -2,11 +2,25 @@ const admin = require("firebase-admin");
 
 class AccountTokensRepository {
   addAccount(uid, account, tokens) {
-    return admin.firestore().collection(`users/${uid}/calendars`).add({
-      tokens,
-      account,
-      userUid: uid,
-    });
+    return admin
+      .firestore()
+      .collection(`users/${uid}/calendars`)
+      .add({
+        tokens,
+        account,
+        userUid: uid,
+        createdAt: new Date(),
+      })
+      .then((docRef) => {
+        const { id } = docRef;
+
+        return {
+          ...account,
+          docId: id,
+          createdAt: new Date(),
+          type: null,
+        };
+      });
   }
 
   getTokens(uid, acccontId) {
@@ -17,7 +31,7 @@ class AccountTokensRepository {
       .get()
       .then((doc) => {
         if (!doc.exists) {
-          throw new Error("Account not exists");
+          throw new Error(`Account ${acccontId} not exists for uid ${uid}`);
         }
 
         return {

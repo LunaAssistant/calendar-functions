@@ -1,19 +1,33 @@
 class EventsService {
   getEvents(calendar, data) {
-    let date = new Date();
-    date.setDate(date.getDate() - 5);
-
     return calendar.events
       .list({
         calendarId: data.calendarName ? data.calendarName : "primary",
-        timeMin: date.toISOString(),
-        maxResults: 100,
+        timeMin: data.start,
+        timeMax: data.end,
+        maxResults: data.limit,
         singleEvents: true,
         orderBy: "startTime",
+        timeZone: data.timeZone,
       })
       .then((response) => {
+        return response.data.items;
+      })
+      .then((events) => {
         return {
-          events: response.data.items,
+          events: events.map((event) => {
+            return {
+              ...event,
+              self: event.attendees
+                ? event.attendees.find((attendee) => {
+                    return attendee.self === true;
+                  })
+                : {
+                    self: true,
+                    responseStatus: "accepted",
+                  },
+            };
+          }),
         };
       })
       .catch((error) => {

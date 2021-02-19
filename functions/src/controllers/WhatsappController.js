@@ -52,7 +52,6 @@ exports.sendMessage = async (request, response) => {
 };
 
 exports.webHook = async (request, response) => {
-  console.log(request.body);
   const service = new WhatsappService();
   const repository = new MessagesRepository();
 

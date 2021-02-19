@@ -1,20 +1,16 @@
 const { google } = require("googleapis");
+const functions = require("firebase-functions");
 
 const {
   AccountTokensRepository,
 } = require("./../repositories/AccountTokensRepository.js");
 
-const config = {
-  baseUrl: process.env.googleauth_host,
-  clientId: process.env.googleauth_clientId,
-  clientSecret: process.env.googleauth_clientSecret,
-};
-
+const config = functions.config();
 class GoogleAuth {
   getOAuth2() {
     return new google.auth.OAuth2(
-      config.clientId,
-      config.clientSecret,
+      config.googleauth.client_id,
+      config.googleauth.client_secret,
       `postmessage`
     );
   }
