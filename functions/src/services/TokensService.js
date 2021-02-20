@@ -35,7 +35,7 @@ class TokensService {
         };
       })
       .then((response) => {
-        userRepository.updateUser(uid, {
+        userRepository.createOrUpdateUser(uid, {
           accountId: response.result.docId,
         });
 

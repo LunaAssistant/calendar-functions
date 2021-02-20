@@ -4,7 +4,13 @@ class UserService {
   createUser(uid, data) {
     const userRepository = new UsersRepository();
 
-    return userRepository.updateUser(uid, data);
+    return userRepository.createOrUpdateUser(uid, data);
+  }
+
+  getUser(uid) {
+    const userRepository = new UsersRepository();
+
+    return userRepository.getUser(uid);
   }
 }
 

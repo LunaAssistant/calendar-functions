@@ -50,6 +50,8 @@ exports.updateUser = functions.firestore
     return eventsController.syncFirstEvents(change, context);
   });
 
+exports.refreshToday = functions.https.onCall(eventsController.refreshToday);
+
 exports.saveUserData = functions.auth.user().onCreate((user) => {
   return accountsController.createUser(user.uid, user);
 });

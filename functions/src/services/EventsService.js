@@ -1,3 +1,6 @@
+const { EventsRepository } = require("./../repositories/EventsRepository.js");
+const moment = require("moment-timezone");
+
 class EventsService {
   getEvents(calendar, data) {
     return calendar.events
@@ -71,6 +74,23 @@ class EventsService {
       .then((response) => {
         return response.data;
       });
+  }
+
+  async refreshToday(calendar, uid, tz) {
+    const eventsRepository = new EventsRepository();
+
+    console.log(moment().tz(tz));
+
+    return this.getEvents(calendar, {
+      start: moment().tz(tz).startOf("day").format(),
+      end: moment().tz(tz).endOf("day").format(),
+      limit: 500,
+      singleEvents: true,
+      orderBy: "startTime",
+      timeZone: tz,
+    }).then((response) => {
+      return eventsRepository.saveEvents(uid, response.events);
+    });
   }
 }
 
