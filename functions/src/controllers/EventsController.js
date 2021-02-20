@@ -193,7 +193,17 @@ exports.refreshToday = async (data, context) => {
             return await calendarApi.getCalendarForAccount(uid, accountId);
         });
 
-        return await eventsService.refreshToday(calendar, uid, timezone);
+        const events = await eventsService.refreshToday(calendar, uid, timezone);
+
+        return {
+            events: events.map(event => {
+                return {
+                    ...event,
+                    startsAt: event.startsAt.format(),
+                    endsAt: event.endsAt.format()
+                }
+            })
+        }
     } catch (error) {
         if (error instanceof UserNotExists) {
             throw new functions.https.HttpsError(

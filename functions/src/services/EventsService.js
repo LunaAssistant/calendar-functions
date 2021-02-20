@@ -94,8 +94,11 @@ class EventsService {
                 timeZone: tz,
             })
         ]).then((responses) => {
-            return eventsRepository.saveEvents(uid, responses[1].events);
-        });
+                eventsRepository.saveEvents(uid, responses[1].events);
+
+                return responses[1].events
+            }
+        );
     }
 }
 

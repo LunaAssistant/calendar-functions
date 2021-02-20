@@ -1,5 +1,5 @@
 const admin = require("firebase-admin");
-const moment = require("moment");
+const moment = require("moment-timezone");
 
 class EventsRepository {
     saveEvents(uid, events) {
