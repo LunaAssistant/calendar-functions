@@ -7,6 +7,7 @@ const {Validator} = require("./../validations/Validator.js");
 const {accountSchema} = require("./../validations/schemas/AccountSchemas");
 const functions = require("firebase-functions");
 const moment = require("moment-timezone");
+const {EventMapper} = require("../mappers/EventMapper");
 const {UserNotExists} = require("../errors/UserNotExists");
 
 exports.getFocusEvents = async (data, context) => {
@@ -182,6 +183,7 @@ exports.syncFirstEvents = async (change, context) => {
 exports.refreshToday = async (data, context) => {
     const eventsService = new EventsService();
     const userService = new UserService();
+    const eventMapper = new EventMapper();
     const calendarApi = new CalendarApi();
 
     const {uid, timezone} = data;
@@ -196,13 +198,8 @@ exports.refreshToday = async (data, context) => {
         const events = await eventsService.refreshToday(calendar, uid, timezone);
 
         return {
-            events: events.map(event => {
-                return {
-                    ...event,
-                    startsAt: event.startsAt.format(),
-                    endsAt: event.endsAt.format()
-                }
-            })
+            events: events.map(e => eventMapper.mapDates(e)),
+            available_time: eventsService.getAvailableTime(timezone, events)
         }
     } catch (error) {
         if (error instanceof UserNotExists) {

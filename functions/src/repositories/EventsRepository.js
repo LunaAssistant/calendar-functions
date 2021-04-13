@@ -7,7 +7,7 @@ class EventsRepository {
         const batch = admin.firestore().batch();
 
         events.forEach((event) => {
-            var eventRef = admin
+            const eventRef = admin
                 .firestore()
                 .collection(`users/${uid}/events`)
                 .doc(event.id);
@@ -22,6 +22,9 @@ class EventsRepository {
         return batch.commit().then(() => {
             console.log("Updated events: ", events.length);
             return true;
+        }).catch((error) => {
+            console.error("Error saving events: ", error)
+            throw  error
         });
     }
 
@@ -44,6 +47,23 @@ class EventsRepository {
         return batch.commit().catch((error) => {
             console.error("Error removing documents: ", error);
         });
+    }
+
+    async getEvents(uid, start, end) {
+        return admin
+            .firestore().collection(`users/${uid}/events`)
+            .where("startsAt", ">=", start)
+            .where("startsAt", "<=", end)
+            .get()
+            .then((querySnapshot) => {
+                const events = {}
+
+                querySnapshot.forEach((doc) => {
+                    events[doc.id] = doc.data()
+                });
+
+                return events
+            })
     }
 }
 
