@@ -3,11 +3,14 @@
   "description": "Cloud Functions for Firebase",
   "scripts": {
     "lint": "eslint .",
-    "serve": "firebase emulators:start",
+    "serve": "firebase emulators:start --only functions",
     "shell": "firebase functions:shell",
     "start": "npm run shell",
-    "deploy": "firebase deploy --only functions",
-    "logs": "firebase functions:log"
+    "logs": "firebase functions:log",
+    "deploy": "npm run env && firebase deploy --only functions",
+    "deploy-dev": "npm run env-dev && firebase deploy --only functions",
+    "env": "test -f env.json && firebase functions:config:unset env && firebase functions:config:set env=\"$(cat env.json)\" || echo \"Please add the file env.json before deploy.\"",
+    "env-dev": "test -f env-dev.json && firebase functions:config:unset env && firebase functions:config:set env=\"$(cat env-dev.json)\" || echo \"Please add the file env-dev.json before deploy.\""
   },
   "engines": {
     "node": "10"

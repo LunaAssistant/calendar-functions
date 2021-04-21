@@ -61,9 +61,8 @@ class GoalsRepository {
                 console.log("Document data:", doc.data());
                 return doc.data()
             } else {
-                // doc.data() will be undefined in this case
                 console.log("No such token!");
-                return null
+                return {}
             }
         }).catch((error) => {
             console.log("Error getting token:", error);

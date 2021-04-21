@@ -49,17 +49,30 @@ class EventsRepository {
         });
     }
 
-    async getEvents(uid, start, end) {
+    async getEventList(uid, start, end) {
         return admin
             .firestore().collection(`users/${uid}/events`)
             .where("startsAt", ">=", start)
             .where("startsAt", "<=", end)
             .get()
             .then((querySnapshot) => {
-                const events = {}
+                const events = []
 
                 querySnapshot.forEach((doc) => {
-                    events[doc.id] = doc.data()
+                    events.push({...doc.data(), id: doc.id})
+                });
+
+                return events
+            })
+    }
+
+    async getEvents(uid, start, end) {
+        return this.getEventList(uid, start, end)
+            .then((list) => {
+                const events = {}
+
+                list.forEach((event) => {
+                    events[event.id] = event
                 });
 
                 return events

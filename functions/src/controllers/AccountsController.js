@@ -62,7 +62,7 @@ exports.generateToken = async (data, context) => {
   try {
     return await tokensService.generateToken(uid, code);
   } catch (error) {
-    console.log("Error genrating token:", error);
+    console.error("Error generating token:", error.stack);
     return error.response.data ? { error: error.response.data } : { error };
   }
 };

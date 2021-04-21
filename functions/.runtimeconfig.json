@@ -1,10 +1,9 @@
 {
-  "whatsapp_host": "https://35.226.171.134/v1",
-  "whatsaap_token": "eyJhbGciOiAiSFMyNTYiLCAidHlwIjogIkpXVCJ9.eyJ1c2VyIjoiYWRtaW4iLCJpYXQiOjE1OTU1Mjc2NjksImV4cCI6MTU5NjEzMjQ2OSwid2E6cmFuZCI6LTYwOTUyNzczMzcyNTQxMDMzNjJ9.gdiG_mAPQOkqIlpeFuT_N0Xx9jAeCOr5VxBDlUMZAOY",
-
-  "googleauth": {
-    "host": "https://us-central1-pure-particle-281600.cloudfunctions.net",
-    "client_id": "373610697734-67f7fsdn2v1ednb22qc9nrr1gsolci2l.apps.googleusercontent.com",
-    "client_secret": "X_CDkA-iObCgxiUjz3haD-uC"
+  "env": {
+    "google_auth": {
+      "host": "https://us-central1-pure-particle-281600.cloudfunctions.net",
+      "client_id": "235643648831-56m1vaf9n5lss5he4vmp1bc2mijq3rk0.apps.googleusercontent.com",
+      "client_secret": "X_CDkA-iObCgxiUjz3haD-uC"
+    }
   }
 }

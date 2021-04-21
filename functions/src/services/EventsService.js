@@ -105,7 +105,7 @@ class EventsService {
 
     async refreshToday(calendar, uid, tz) {
         const eventsRepository = new EventsRepository();
-        const {start, end, events} = await this.getToday(calendar, uid, tz)
+        const {start, end, events} = await this.getToday(calendar, uid, tz);
 
         eventsRepository.deleteEvents(uid, start.toDate(), end.toDate()).then(() => {
             return eventsRepository.saveEvents(uid, events)
@@ -161,8 +161,8 @@ class EventsService {
 
         while (p < events.length) {
             const event = events[p]
-            const startsAt = moment(event.startsAt)
-            const endsAt = moment(event.startsAt)
+            const startsAt = moment(event.startsAt).tz(tz)
+            const endsAt = moment(event.endsAt).tz(tz)
 
             if (now.isBefore(startsAt)) {
                 result = [events[p - 1], undefined, event]

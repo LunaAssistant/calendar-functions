@@ -10,6 +10,10 @@ const moment = require("moment-timezone");
 const {EventMapper} = require("../mappers/EventMapper");
 const {UserNotExists} = require("../errors/UserNotExists");
 
+const eventsRepository = new EventsRepository();
+const eventsService = new EventsService();
+const eventMapper = new EventMapper();
+
 exports.getFocusEvents = async (data, context) => {
     const validator = new Validator();
     let {validation} = await validator.validate(accountSchema, data);
@@ -55,26 +59,25 @@ exports.getFocusEvents = async (data, context) => {
 };
 
 exports.getEvents = async (data, context) => {
-    const validator = new Validator();
-    let {validation} = await validator.validate(accountSchema, data);
-
-    if (validation) {
-        return {error: validation};
-    }
-
-    const {uid, accountId} = data;
-    const calendarApi = new CalendarApi();
+    const {uid, timezone} = data;
 
     try {
-        const {calendar} = await calendarApi.getCalendarForAccount(
+        let events = await eventsRepository.getEventList(
             uid,
-            accountId
-        );
-        const eventsService = new EventsService();
+            moment().tz(timezone).startOf("day"),
+            moment().tz(timezone).endOf("day")
+        )
 
-        return await eventsService.getEvents(calendar, data);
+        events = events.map(e => eventMapper.mapDates(e))
+
+        const availableTime = eventsService.getAvailableTime(timezone, events)
+
+        return {
+            events,
+            availableTime
+        }
     } catch (error) {
-        console.error("Error getting calendar events", error);
+        console.error("Error getting events", error);
 
         return {
             error: error.message ? error.message : error,
@@ -98,7 +101,6 @@ exports.createEvent = async (data, context) => {
             uid,
             accountId
         );
-        const eventsService = new EventsService();
 
         return await eventsService.createEvent(calendar, calendarName, event);
     } catch (error) {
@@ -126,7 +128,6 @@ exports.updateEvent = async (data, context) => {
             uid,
             accountId
         );
-        const eventsService = new EventsService();
 
         return await eventsService.updateEvent(calendar, calendarId, eventId, data);
     } catch (error) {
@@ -155,7 +156,6 @@ exports.syncFirstEvents = async (change, context) => {
                 uid,
                 accountId
             );
-            const eventsService = new EventsService();
             const eventsRepository = new EventsRepository();
 
             return eventsService
@@ -181,7 +181,6 @@ exports.syncFirstEvents = async (change, context) => {
 };
 
 exports.refreshToday = async (data, context) => {
-    const eventsService = new EventsService();
     const userService = new UserService();
     const eventMapper = new EventMapper();
     const calendarApi = new CalendarApi();

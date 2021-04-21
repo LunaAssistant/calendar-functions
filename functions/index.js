@@ -13,11 +13,11 @@ require("dotenv").config();
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 
-const cors = require("cors")({origin: true});
+// const cors = require("cors")({origin: true});
 
 // Initialize the app with a service account, granting admin privileges
 admin.initializeApp({
-    credential: admin.credential.cert(require("./serviceAccount.json")),
+    credential: admin.credential.cert(require("./serviceAccountDev.json")),
 });
 
 exports.generateToken = functions.https.onCall(
@@ -63,7 +63,7 @@ exports.getTodayGoals = functions.https.onCall(goalsController.getToday);
 exports.saveGoals = functions.https.onCall(goalsController.saveGoals);
 
 // V2
-exports.getHome = functions.https.onCall(homeController.getHome)
-exports.calculate = functions.https.onCall(goalsController.calculate)
+exports.getHome = functions.https.onCall(homeController.getHome);
 exports.getEvents = functions.https.onCall(eventsController.getEvents);
-exports.prioritize = functions.https.onCall(goalsController.prioritize)
+exports.calculate = functions.https.onCall(goalsController.calculate);
+exports.prioritize = functions.https.onCall(goalsController.prioritize);

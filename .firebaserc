@@ -1,7 +1,7 @@
 {
   "projects": {
-    "default": "luna-app-e70e9",
-    "develop": "luna-app-e70e9",
-    "master": "assistant-luna"
+    "default": "assistant-luna-dev",
+    "development": "assistant-luna-dev",
+    "production": "assistant-luna"
   }
 }

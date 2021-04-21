@@ -63,7 +63,10 @@ node_modules/
 
 # dotenv environment variables file
 .env
-.env.json
-.env-dev.json
-serviceAccount.json
-serviceAccountDev.json
+functions/env.json
+functions/env-dev.json
+functions/serviceAccount.json
+functions/serviceAccountDev.json
+
+# idea
+.idea/*

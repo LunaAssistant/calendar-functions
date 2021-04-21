@@ -1,48 +1,48 @@
-const {CalendarsService} = require("../services/CalendarsService.js");
 const {UserService} = require("../services/UserService.js");
-const {ColorsService} = require("../services/ColorsService.js");
-const {TokensService} = require("../services/TokensService.js");
-
-const {CalendarApi} = require("../googleapi/CalendarApi.js");
-const {Validator} = require("../validations/Validator.js");
-const {accountSchema} = require("../validations/schemas/AccountSchemas");
 const functions = require("firebase-functions");
+const {PrioritiesRepository} = require("../repositories/PrioritiesRepository");
 const {GoalsService} = require("../services/GoalsService");
 const {EventsService} = require("../services/EventsService");
 const {EventMapper} = require("../mappers/EventMapper");
 
 const {UserNotExists} = require("../errors/UserNotExists");
+const moment = require("moment-timezone");
 
+const eventsService = new EventsService();
+const userService = new UserService();
+const eventMapper = new EventMapper();
+const goalsService = new GoalsService();
+const prioritiesRepository = new PrioritiesRepository()
 
 exports.getHome = async (data, context) => {
-    const eventsService = new EventsService();
-    const userService = new UserService();
-    const eventMapper = new EventMapper();
-    const goalsService = new GoalsService()
-
     const {uid, timezone} = data;
 
     try {
         const {calendar} = await userService.getCalendar(uid);
 
-        return Promise.all([
+        return await Promise.all([
             eventsService.refreshToday(calendar, uid, timezone).then((events) =>
                 events.map(e => eventMapper.mapDates(e))
-            ), goalsService.getToday(uid, timezone)
+            ), goalsService.getToday(uid, timezone),
+            prioritiesRepository.getPriority(uid, moment().tz(timezone).startOf("day"), moment().tz(timezone).endOf("day"))
         ]).then((promises) => {
-                const [events, goals] = promises
-                const availableTime = eventsService.getAvailableTime(timezone, events)
+                const [events, goals, priority] = promises
                 const currentEvents = eventsService.getCurrentEvents(timezone, events).map((e) => eventMapper.mapCurrentEvent(e))
 
                 return {
-                    events,
                     currentEvents,
-                    availableTime,
-                    goals
+                    goals,
+                    priority: priority || {
+                        goalEvents: 0,
+                        goalMinutes: 0,
+                        optimizedMinutes: 0,
+                    }
                 }
             }
         )
     } catch (error) {
+        console.error("Error getting home: ", error.stack)
+
         if (error instanceof UserNotExists) {
             throw new functions.https.HttpsError(
                 "invalid-argument",

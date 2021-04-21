@@ -1,10 +1,12 @@
 const moment = require("moment-timezone");
 const {EventsRepository} = require("../repositories/EventsRepository");
+const {PrioritiesRepository} = require("../repositories/PrioritiesRepository");
 const {EventMapper} = require("../mappers/EventMapper");
 const {UserService} = require("./UserService");
 const {EventsService} = require("./EventsService");
 const {GoalsRepository} = require("../repositories/GoalsRepository");
 
+const prioritiesRepository = new PrioritiesRepository();
 const goalsRepository = new GoalsRepository();
 const eventsRepository = new EventsRepository();
 const eventsService = new EventsService();
@@ -38,8 +40,6 @@ class GoalsService {
             return eventMapper.mapMomentDates({priority: event.priority, ...eventsMap[event.id]})
         })
 
-        const priority = this.getPriority(high, newEvents, optimized)
-
         const {calendar, email} = await userService.getCalendar(uid);
 
         const saveGoals = goalsRepository.saveGaols(uid, goals)
@@ -60,8 +60,9 @@ class GoalsService {
                 ],
             })
         })
+        const savePriority = prioritiesRepository.savePriority(uid, this.getPriority(high, newEvents, optimized))
 
-        return Promise.all([saveGoals, ...createEvents, ...updates])
+        return Promise.all([saveGoals, ...createEvents, ...updates, savePriority])
     }
 
     async getToday(uid, tz) {
@@ -110,13 +111,9 @@ class GoalsService {
     async validateToken(userUid, token) {
         const {uid, expiredAt} = await goalsRepository.getGoalToken(token)
 
-        console.log({uid, expiredAt})
-
         if (expiredAt !== null || userUid !== uid) {
             return false
         }
-
-        console.log({uid, expiredAt})
 
         return goalsRepository.expireToken(token).then(() => {
             return true
